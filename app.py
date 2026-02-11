@@ -1,4 +1,5 @@
-from flask import Flask, render_template
+import folium
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
@@ -6,8 +7,11 @@ app = Flask(__name__)
 def home():
     return render_template('accueil.html')
 
-@app.route('/carte')
+@app.route('/carte',methods=['GET', 'POST'])
 def about():
+    m = folium.Map(location=[50.952, 1.881], zoom_start=15)
+    folium.Marker([50.952, 1.881], popup='Je suis ici !').add_to(m)
+    m.save('static/map.html')
     return render_template('carte.html')
 
 # @app.route('/about')
