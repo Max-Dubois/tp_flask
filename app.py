@@ -7,7 +7,7 @@ app = Flask(__name__)
 def home():
     return render_template('accueil.html')
 
-@app.route('/carte',methods=['GET', 'POST'])
+@app.route('/carte')
 def carte():
     m = folium.Map(location=[50.952, 1.881], zoom_start=15)
     folium.Marker([50.952, 1.881], popup='Je suis ici !').add_to(m)
