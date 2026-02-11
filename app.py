@@ -52,7 +52,6 @@ def serve_image(full_path):
 def kmeans():
     image_path = request.form.get('image_path')
     k = request.form.get('k', 5)
-    # On renvoie simplement la page de résultat avec les paramètres
     return render_template('resultat.html', image_path=image_path, k=k)
 
 @app.route('/result_kmeans')
