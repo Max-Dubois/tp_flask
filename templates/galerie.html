@@ -16,16 +16,30 @@
         </p>
     </div>
 
-    <form method="POST">
-        <button type="submit">Sélectionner un répertoire sur mon ordinateur</button>
-    </form>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <form method="POST">
+            <button type="submit">Sélectionner un répertoire sur mon ordinateur</button>
+        </form>
+    </div>
 
     {% if folder_path %}
         <div class="gallery">
             {% for img_name in images %}
-                {# On crée le chemin complet pour Flask #}
                 {% set full_path = folder_path + '/' + img_name %}
-                <img src="{{ url_for('serve_image', full_path=full_path) }}" alt="Image">
+                <div class="image-card">
+                    <img src="{{ url_for('serve_image', full_path=full_path) }}" alt="Image">
+                    
+                    <div class="kmeans-controls">
+                        <form action="/kmeans" method="POST" target="_blank">
+                            <input type="hidden" name="image_path" value="{{ full_path }}">
+                            <label for="k">Clusters (k):</label>
+                            <input type="number" name="k" value="5" min="1" max="100">
+                            <button type="submit" style="display: block; width: 100%; margin-top: 5px;">
+                                Segmenter l'image
+                            </button>
+                        </form>
+                    </div>
+                </div>
             {% endfor %}
         </div>
     {% endif %}
