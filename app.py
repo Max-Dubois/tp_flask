@@ -51,21 +51,34 @@ def serve_image(full_path):
 @app.route('/kmeans', methods=['POST'])
 def kmeans():
     image_path = request.form.get('image_path')
-    k_clusters = int(request.form.get('k', 5))
+    k = request.form.get('k', 5)
+    # On renvoie simplement la page de résultat avec les paramètres
+    return render_template('resultat.html', image_path=image_path, k=k)
+
+@app.route('/result_kmeans')
+def generate_kmeans_image():
+    image_path = request.args.get('image_path')
+    k_clusters = int(request.args.get('k', 5))
 
     img = cv2.imread(image_path)
-    if img is None:
-        return "Erreur : Impossible de charger l'image.", 400
+    if img is None: return "Erreur", 400
 
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    pixels = img_rgb.reshape((-1, 3))
+    
+    scale_percent = 30 
+    width = int(img_rgb.shape[1] * scale_percent / 100)
+    height = int(img_rgb.shape[0] * scale_percent / 100)
+    img_small = cv2.resize(img_rgb, (width, height), interpolation=cv2.INTER_AREA)
+    
+    pixels_small = img_small.reshape((-1, 3))
+    pixels_full = img_rgb.reshape((-1, 3))
 
-    kmeans = KMeans(n_clusters=k_clusters, init="k-means++", n_init=10, max_iter=100, random_state=42)
-    kmeans.fit(pixels)
-
+    kmeans = KMeans(n_clusters=k_clusters, n_init=1, max_iter=10, random_state=42)
+    kmeans.fit(pixels_small)
+    
+    labels_full = kmeans.predict(pixels_full)
     couleurs_centres = np.uint8(kmeans.cluster_centers_)
-    pixels_segmentes = couleurs_centres[kmeans.labels_]
-    image_finale = pixels_segmentes.reshape(img_rgb.shape)
+    image_finale = couleurs_centres[labels_full].reshape(img_rgb.shape)
 
     _, buffer = cv2.imencode('.jpg', cv2.cvtColor(image_finale, cv2.COLOR_RGB2BGR))
     return send_file(io.BytesIO(buffer), mimetype='image/jpeg')
