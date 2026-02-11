@@ -1,5 +1,8 @@
+from tkinter import filedialog
 import folium
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
+import os
+import tkinter as tk
 
 app = Flask(__name__)
 
@@ -17,17 +20,28 @@ def carte():
 @app.route('/galerie', methods=['GET', 'POST'])
 def galerie():
     images = []
+    folder_path = ""
+    
     if request.method == 'POST':
-        files = request.files.getlist("folder_files")
-        
-        for file in files:
-            if file.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
-                import base64
-                file_content = file.read()
-                base64_pic = base64.b64encode(file_content).decode('utf-8')
-                images.append(f"data:{file.content_type};base64,{base64_pic}")
+        root = tk.Tk()
+        root.withdraw()
+        root.attributes('-topmost', True)
+        folder_path = filedialog.askdirectory()
+        root.destroy()
+
+        if folder_path:
+            valid_exts = ('.png', '.jpg', '.jpeg', '.gif', '.webp')
+            for filename in os.listdir(folder_path):
+                if filename.lower().endswith(valid_exts):
+                    images.append(filename)
                 
-    return render_template('galerie.html', images=images)
+    return render_template('galerie.html', images=images, folder_path=folder_path)
+
+@app.route('/image/<path:full_path>')
+def serve_image(full_path):
+    directory = os.path.dirname(full_path)
+    filename = os.path.basename(full_path)
+    return send_from_directory(directory, filename)
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
