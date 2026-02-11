@@ -62,20 +62,23 @@ def generate_kmeans_image():
     if img is None: return "Erreur", 400
 
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    h, w, _ = img_rgb.shape
+    yy, xx = np.meshgrid(np.linspace(0, 255, h), np.linspace(0, 255, w), indexing='ij')
     
+    data_full = np.dstack((img_rgb, xx, yy)).reshape((-1, 5))
+
     scale_percent = 30 
-    width = int(img_rgb.shape[1] * scale_percent / 100)
-    height = int(img_rgb.shape[0] * scale_percent / 100)
-    img_small = cv2.resize(img_rgb, (width, height), interpolation=cv2.INTER_AREA)
-    
-    pixels_small = img_small.reshape((-1, 3))
-    pixels_full = img_rgb.reshape((-1, 3))
+    img_small = cv2.resize(img_rgb, (int(w*scale_percent/100), int(h*scale_percent/100)), interpolation=cv2.INTER_AREA)
+    sh, sw, _ = img_small.shape
+    s_yy, s_xx = np.meshgrid(np.linspace(0, 255, sh), np.linspace(0, 255, sw), indexing='ij')
+    data_small = np.dstack((img_small, s_xx, s_yy)).reshape((-1, 5))
 
     kmeans = KMeans(n_clusters=k_clusters, n_init=1, max_iter=10, random_state=42)
-    kmeans.fit(pixels_small)
+    kmeans.fit(data_small)
     
-    labels_full = kmeans.predict(pixels_full)
-    couleurs_centres = np.uint8(kmeans.cluster_centers_)
+    labels_full = kmeans.predict(data_full)
+
+    couleurs_centres = np.uint8(kmeans.cluster_centers_[:, :3])
     image_finale = couleurs_centres[labels_full].reshape(img_rgb.shape)
 
     _, buffer = cv2.imencode('.jpg', cv2.cvtColor(image_finale, cv2.COLOR_RGB2BGR))
