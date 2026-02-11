@@ -1,5 +1,5 @@
 import folium
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
@@ -14,9 +14,20 @@ def carte():
     m.save('static/map.html')
     return render_template('carte.html')
 
-# @app.route('/about')
-# def about():
-#     return "À propos de moi : Je suis en train d'apprendre à développer des applications web avec Flask !"
+@app.route('/galerie', methods=['GET', 'POST'])
+def galerie():
+    images = []
+    if request.method == 'POST':
+        files = request.files.getlist("folder_files")
+        
+        for file in files:
+            if file.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+                import base64
+                file_content = file.read()
+                base64_pic = base64.b64encode(file_content).decode('utf-8')
+                images.append(f"data:{file.content_type};base64,{base64_pic}")
+                
+    return render_template('galerie.html', images=images)
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)

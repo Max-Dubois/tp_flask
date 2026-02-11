@@ -31,3 +31,14 @@ ul {
     font-style: italic; 
     color: #7f8c8d; 
 }
+.gallery { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 10px; 
+    margin-top: 20px; 
+}
+.gallery img { 
+    width: 200px; 
+    height: auto; 
+    border: 1px solid #ccc; 
+}
