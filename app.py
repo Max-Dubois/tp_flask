@@ -1,12 +1,11 @@
 from tkinter import filedialog
 import folium
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, render_template, request, send_from_directory, send_file
 import os
 import tkinter as tk
 import cv2
 import numpy as np
 import io
-from flask import send_file
 from sklearn.cluster import KMeans
 
 app = Flask(__name__)
