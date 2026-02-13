@@ -104,7 +104,8 @@ def generate_hierarchical_image():
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     h, w, _ = img_rgb.shape
 
-    scale = 0.2
+    max_dim = 100
+    scale = max_dim / max(h, w)
     img_small = cv2.resize(img_rgb, (int(w*scale), int(h*scale)), interpolation=cv2.INTER_AREA)
     sh, sw, _ = img_small.shape
     

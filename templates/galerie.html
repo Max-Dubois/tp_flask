@@ -37,8 +37,13 @@
                             <button type="submit" style="display: block; width: 100%; margin-top: 5px;">
                                 Segmenter l'image
                             </button>
+                        </form>
+                        <form action="/hierarchique" method="POST" target="_blank" style="margin-top: 10px;">
+                            <input type="hidden" name="image_path" value="{{ full_path }}">
+                            <label for="k_hierarchical">Clusters (k):</label>
+                            <input type="number" name="k" value="5" min="1" max="100">
                             <button type="submit" style="display: block; width: 100%; margin-top: 5px;">
-                                Approche hiérarchique
+                                Segmentation Hiérarchique
                             </button>
                         </form>
                     </div>
