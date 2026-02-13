@@ -30,7 +30,7 @@
                     <img src="{{ url_for('serve_image', full_path=full_path) }}" alt="Image">
                     
                     <div class="kmeans-controls">
-                        <form action="/kmeans" method="POST">
+                        <!-- <form action="/kmeans" method="POST">
                             <input type="hidden" name="image_path" value="{{ full_path }}">
                             <label for="k">Clusters (k):</label>
                             <input type="number" name="k" value="5" min="1" max="100">
@@ -44,6 +44,14 @@
                             <input type="number" name="k" value="5" min="1" max="100">
                             <button type="submit" style="display: block; width: 100%; margin-top: 5px;">
                                 Segmentation Hiérarchique
+                            </button>
+                        </form> -->
+                        <form action="/dbscan" method="POST" style="margin-top: 10px;">
+                            <input type="hidden" name="image_path" value="{{ full_path }}">
+                            <label for="k_dbscan">Clusters (k):</label>
+                            <input type="number" name="k" value="5" min="1" max="100">
+                            <button type="submit" style="display: block; width: 100%; margin-top: 5px;">
+                                Segmentation DBScan
                             </button>
                         </form>
                     </div>
