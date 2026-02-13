@@ -7,12 +7,7 @@ import cv2
 import numpy as np
 import io
 from sklearn.cluster import KMeans
-from sklearn import metrics
-from sklearn.datasets import make_blobs
-from sklearn.preprocessing import StandardScaler
-from scipy.cluster.hierarchy import dendrogram
 from sklearn.cluster import AgglomerativeClustering
-import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 
