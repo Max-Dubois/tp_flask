@@ -147,7 +147,7 @@ def generate_dbscan_image():
     k_clusters = int(request.args.get('k', 5))
     
     eps = 50 / k_clusters
-    min_samples = 5
+    min_samples = 2
 
     img = cv2.imread(image_path)
     if img is None: return "Erreur lors du chargement", 400
