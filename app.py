@@ -8,6 +8,7 @@ import numpy as np
 import io
 from sklearn.cluster import KMeans
 from sklearn.cluster import AgglomerativeClustering
+from sklearn.neighbors import KNeighborsClassifier
 
 app = Flask(__name__)
 
@@ -98,31 +99,38 @@ def generate_hierarchical_image():
     k_clusters = int(request.args.get('k', 5))
 
     img = cv2.imread(image_path)
-    if img is None: return "Erreur", 400
+    if img is None: return "Erreur lors du chargement", 400
 
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     h, w, _ = img_rgb.shape
-    yy, xx = np.meshgrid(np.linspace(0, 255, h), np.linspace(0, 255, w), indexing='ij')
-    
-    data_full = np.dstack((img_rgb, xx, yy)).reshape((-1, 5))
 
-    scale_percent = 30 
-    img_small = cv2.resize(img_rgb, (int(w*scale_percent/100), int(h*scale_percent/100)), interpolation=cv2.INTER_AREA)
+    scale = 0.2
+    img_small = cv2.resize(img_rgb, (int(w*scale), int(h*scale)), interpolation=cv2.INTER_AREA)
     sh, sw, _ = img_small.shape
-    s_yy, s_xx = np.meshgrid(np.linspace(0, 255, sh), np.linspace(0, 255, sw), indexing='ij')
-    data_small = np.dstack((img_small, s_xx, s_yy)).reshape((-1, 5))
+    
+    s_yy, s_xx = np.mgrid[0:sh, 0:sw]
+    data_small = np.column_stack((img_small.reshape(-1, 3), s_xx.ravel(), s_yy.ravel()))
+    model = AgglomerativeClustering(n_clusters=k_clusters, linkage='ward')
+    labels_small = model.fit_predict(data_small)
 
-    hierarchique = AgglomerativeClustering(n_clusters=k_clusters)
-    labels_small = hierarchique.fit_predict(data_small)
-
-    couleurs_centres = np.zeros((k_clusters, 3), dtype=np.uint8)
+    colors_map = np.zeros((k_clusters, 3), dtype=np.uint8)
     for i in range(k_clusters):
         mask = (labels_small == i)
-        if np.sum(mask) > 0:
-            couleurs_centres[i] = np.mean(data_small[mask][:,:3], axis=0).astype(np.uint8)
+        if np.any(mask):
+            colors_map[i] = np.mean(img_small.reshape(-1, 3)[mask], axis=0)
 
-    labels_full = hierarchique.fit_predict(data_full)
-    image_finale = couleurs_centres[labels_full].reshape(img_rgb.shape)
+    knn = KNeighborsClassifier(n_neighbors=1)
+    knn.fit(data_small, labels_small)
+    
+    f_yy, f_xx = np.mgrid[0:h, 0:w]
+    data_full = np.column_stack((
+        img_rgb.reshape(-1, 3), 
+        (f_xx.ravel() * scale), 
+        (f_yy.ravel() * scale)
+    ))
+    
+    labels_full = knn.predict(data_full)
+    image_finale = colors_map[labels_full].reshape(h, w, 3)
 
     _, buffer = cv2.imencode('.jpg', cv2.cvtColor(image_finale, cv2.COLOR_RGB2BGR))
     return send_file(io.BytesIO(buffer), mimetype='image/jpeg')

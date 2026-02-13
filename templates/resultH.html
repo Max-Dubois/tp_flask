@@ -2,12 +2,12 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Comparaison K-Means</title>
+    <title>Comparaison Approche Hiérarchique</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div style="text-align: center;">
-        <h1>Résultat de la Segmentation</h1>
+        <h1>Résultat de la Segmentation Hiérarchique</h1>
         <a href="/galerie" style="color: #3498db; text-decoration: none;">← Retour à la galerie</a>
     </div>
 
@@ -18,13 +18,9 @@
         </div>
 
         <div class="comparison-box">
-            <h3>Approche hiérarchique (k={{ k }})</h3>
+            <h3>Approche hiérarchique</h3>
             <img src="{{ url_for('generate_hierarchical_image', image_path=image_path, k=k) }}" alt="Segmentée">
         </div>
-    </div>
-
-    <div class="info-panel">
-        <p>L'algorithme a regroupé les pixels en <strong>{{ k }} couleurs dominantes</strong>.</p>
     </div>
 </body>
 </html>
